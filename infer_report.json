@@ -1,0 +1,65 @@
+{
+  "generations": [
+    {
+      "prefix": "the cat",
+      "grownet": "ran to the tank </s>",
+      "fixed_small": "flew to the nest </s>",
+      "fixed_large": "ran to the nest </s>"
+    },
+    {
+      "prefix": "a dog",
+      "grownet": "flew to the rug </s>",
+      "fixed_small": "sat on the rug </s>",
+      "fixed_large": "flew to the rug </s>"
+    },
+    {
+      "prefix": "the bird",
+      "grownet": "sat on the tank </s>",
+      "fixed_small": "sat to the rug </s>",
+      "fixed_large": "sat on the tank </s>"
+    },
+    {
+      "prefix": "the fish",
+      "grownet": "flew to the rug </s>",
+      "fixed_small": "flew to the rug </s>",
+      "fixed_large": "ran to the rug </s>"
+    }
+  ],
+  "surprise_tau": 0.9676805185599227,
+  "ephemeral_triggers": 48,
+  "ephemeral_demo_windows": 5,
+  "seen_sent": "the cat flew to the tank",
+  "unseen_sent": "the dog ran to the mat",
+  "ig_seen": [
+    0.6656674146652222,
+    0.5959283709526062,
+    0.5539824366569519,
+    0.6478903889656067,
+    0.6383090615272522,
+    0.589055061340332
+  ],
+  "og_seen": [
+    0.6936997771263123,
+    0.6292423009872437,
+    0.5916023254394531,
+    0.6254590749740601,
+    0.677299976348877,
+    0.64737868309021
+  ],
+  "ig_unseen": [
+    0.6656674146652222,
+    0.5959283709526062,
+    0.5625340342521667,
+    0.648747980594635,
+    0.6342865824699402,
+    0.5874961614608765
+  ],
+  "og_unseen": [
+    0.6936997771263123,
+    0.6292423009872437,
+    0.5922510623931885,
+    0.6276150941848755,
+    0.679965615272522,
+    0.6328191757202148
+  ]
+}

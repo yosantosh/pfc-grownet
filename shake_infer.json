@@ -1,0 +1,105 @@
+{
+  "generations": {
+    "To be, or not": {
+      "grownet": "To be, or not on andis of the amsulf wir tiect the: thom that we ceThall He.\n\nThat sish the indenter he had ag the Onbers blone dith:\nThes to the fumsgond tay luctient; se to be your nof Retdrenow hed some, the pr",
+      "fixed_small": "To be, or not to fuy lopre shave the fors fives,\nA wert plecr\nI lome lankett th I would cith thas ay the ged all corneus to base theargen.\n\nCOFyNoan: to krit,\nSeribet\n\nThe wimim shof ohe pithe paot to cat, bre and",
+      "fixed_large": "To be, or not in aid the counse pot'er has of con.\n\nVIRTReI mave fraresting the gees to wirther hat the for everearce, for he pa-pstimns hici, not fy fhis brdient, thace,\nMeny sevoll with the parte, that the oirth"
+    },
+    "KING:\n": {
+      "grownet": "KING:\nIR an the rurdishs show agminto\ntot whe: that you\nThe ratunatirtouf in word, ghe! 'thear'se stiennsboum;\n\nBRUThe mill yoor, and fletheis him batnes, you Krest lenather.\n\nCOMINIUS:\nTattrought ill\nThe i",
+      "fixed_small": "KING:\nBus The tae hear there trust\nWe che thouy anther cuvet at a murit is willes yours, wethre your stitor wall the Weare; he lild, I?\n\nSICINIUS:\nAoWe doindet hotheve\nves ford cone.\n\nVIORNIUS:\nGo ss me poo",
+      "fixed_large": "KING:\nAf so to the prisesely thanis-q\nWier have be the sis.\n\nMARCIUS:\nHiss dill wneld to kut weardNingondy than conporf they seon. of the people,\nWho eruther in not it the will your hith preich aiven orezeo"
+    },
+    "All the world's": {
+      "grownet": "All the world's\nAnd sulver,\nAL\nAll I haiThou dar diend thes a ireq heprougre, streot Lore bales to gretitins\nOf Mercous, makM-shas with is cosse.\n\nBRUTUS:\nWuentll nove you wall owt\nThat de onsh ilpaly thiis I warle,",
+      "fixed_small": "All the world's you cont wad Afureids.\n\nBOzirI:\nNand capyou cibntteans, of ther ceich't have savaste&\nBn:\nOn hit to tule\nAuM,\nMaNle and wall his than foNthin,\nOnn with we lome ford thinRWuncarst noun woult, she heru",
+      "fixed_large": "All the world's the there's ancipincone oum: o' the had sonecon frees nos ho an or; and ce ver fhat dee them Lfout to, I mave you ba, whom be wiy thambit there yougheng to the have the toming busplem anath aimPdo ha"
+    }
+  },
+  "tau": 3.2799158386108473,
+  "median_nll_grow": 1.838232934474945,
+  "median_nll_large": 1.7247982621192932,
+  "robustness": {
+    "grownet": [
+      {
+        "corrupt": 0.0,
+        "loss": 1.987663553873698,
+        "acc": 0.43933333333333335
+      },
+      {
+        "corrupt": 0.05,
+        "loss": 2.134971923828125,
+        "acc": 0.4073333333333333
+      },
+      {
+        "corrupt": 0.1,
+        "loss": 2.294021525065104,
+        "acc": 0.381
+      },
+      {
+        "corrupt": 0.2,
+        "loss": 2.587572998046875,
+        "acc": 0.326
+      },
+      {
+        "corrupt": 0.3,
+        "loss": 2.8950897216796876,
+        "acc": 0.2876666666666667
+      }
+    ],
+    "fixed_small": [
+      {
+        "corrupt": 0.0,
+        "loss": 2.173524943033854,
+        "acc": 0.4003333333333333
+      },
+      {
+        "corrupt": 0.05,
+        "loss": 2.2912587890625,
+        "acc": 0.37633333333333335
+      },
+      {
+        "corrupt": 0.1,
+        "loss": 2.43060888671875,
+        "acc": 0.346
+      },
+      {
+        "corrupt": 0.2,
+        "loss": 2.6788912353515624,
+        "acc": 0.30233333333333334
+      },
+      {
+        "corrupt": 0.3,
+        "loss": 2.9273392740885416,
+        "acc": 0.261
+      }
+    ],
+    "fixed_large": [
+      {
+        "corrupt": 0.0,
+        "loss": 1.964855733235677,
+        "acc": 0.445
+      },
+      {
+        "corrupt": 0.05,
+        "loss": 2.1174876098632813,
+        "acc": 0.4206666666666667
+      },
+      {
+        "corrupt": 0.1,
+        "loss": 2.2700367635091148,
+        "acc": 0.38466666666666666
+      },
+      {
+        "corrupt": 0.2,
+        "loss": 2.573268310546875,
+        "acc": 0.3263333333333333
+      },
+      {
+        "corrupt": 0.3,
+        "loss": 2.8669731038411457,
+        "acc": 0.2793333333333333
+      }
+    ]
+  }
+}
