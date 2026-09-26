@@ -26,17 +26,18 @@ torch.manual_seed(SEED); np.random.seed(SEED)
 
 
 def load_models(vocab_size):
-    grow = PFCGrowNet(vocab_size, 16, 4, h0=12, hmax=48).to(DEVICE)
-    small = FixedMLM(vocab_size, 16, 4, h=12).to(DEVICE)
+    grow = PFCGrowNet(vocab_size, 16, 4, h0=3, hmax=48, deepmax=16).to(DEVICE)
+    small = FixedMLM(vocab_size, 16, 4, h=3).to(DEVICE)
     large = FixedMLM(vocab_size, 16, 4, h=48).to(DEVICE)
     grow.load_state_dict(torch.load(HERE / "grownet.pt", map_location=DEVICE))
     small.load_state_dict(torch.load(HERE / "fixed_small.pt", map_location=DEVICE))
     large.load_state_dict(torch.load(HERE / "fixed_large.pt", map_location=DEVICE))
-    # n_active is a plain int (not in state_dict) -> restore from training metrics
+    # n_active/deep-n are plain ints (not in state_dict) -> restore from training metrics
     try:
         with open(HERE / "metrics.json") as f:
             mj = json.load(f)
         grow.hidden.n_active = int(mj["hist"]["grownet"]["hsize"][-1])
+        grow.deep.n_active = int(mj["hist"]["grownet"].get("dsize", [0])[-1])
     except Exception:
         pass
     for m in (grow, small, large):
@@ -115,8 +116,9 @@ def main():
         c, t = list(Xte[idx]), int(Yte[idx])
         key = tuple(c + [t])
         # ephemeral: temporarily grow 2 scratch neurons (zero-init readout => safe)
+        snap = grow.structural_snapshot()
         old = grow.hidden.n_active
-        added = grow.grow(2, grad_hint=torch.randn(grow.in_dim) * 0.1)
+        added = grow.grow_hidden(2, grad_hint=torch.randn(grow.in_dim) * 0.1)
         # score: does scratch reduce NLL on this window?
         nll_before = surprise_nll(grow, c, t)  # with scratch (zero-init => same)
         # give scratch a tiny Hebbian nudge then measure
@@ -127,19 +129,8 @@ def main():
         grow.ephemeral_counts[key] = grow.ephemeral_counts.get(key, 0) + 1
         if gain > 0.005:
             committed += 0  # would keep for this sample only (ephemeral use demonstrated)
-        # discard scratch to keep model intact (ephemeral!)
-        keep = torch.ones(grow.hidden.n_active, dtype=torch.bool)
-        keep[old:old+added] = False
-        # compress readout cols back
-        with torch.no_grad():
-            nm = int(keep.sum())
-            idxk = torch.where(keep)[0]
-            grow.readout.weight[:, :nm].copy_(grow.readout.weight[:, idxk])
-            grow.readout.weight[:, nm:].zero_()
-            for lin in [grow.ingate, grow.outgate, grow.write]:
-                lin.weight[:, :nm].copy_(lin.weight[:, idxk])
-                lin.weight[:, nm:].zero_()
-        grow.hidden.prune(keep)
+        # discard scratch to keep model intact (ephemeral!) - exact restore
+        grow.structural_restore(snap)
     print(f"ephemeral demo: spawned+discarded scratch on 5 novel windows (model intact h={grow.hidden.n_active}, started {before}); committed-permanent={committed} (hybrid gate: repeat-gated)")
 
     # 4) gate/stripe usage on a seen vs unseen sentence (pick pair differing EARLY

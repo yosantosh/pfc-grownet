@@ -14,8 +14,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from dataset import make_splits
-from pfc_grownet import PFCGrowNet
+from pfc_grownet import PFCGrowNet, SEED_N
 from baselines import FixedMLM
+from growth_trial import select_growth, hard_inputs, pc_hint
 
 HERE = Path(__file__).parent
 PLOTS = HERE / "plots"
@@ -26,7 +27,7 @@ random.seed(SEED); np.random.seed(SEED); torch.manual_seed(SEED)
 
 DEVICE = torch.device("cpu")
 CTX, D_EMB = 4, 16
-H0, HMAX = 12, 48
+H0, HMAX, DEEPMAX = SEED_N, 48, 16  # born with 3 neurons; deep layer born empty
 EPOCHS = 30
 BATCH = 64
 BASE_LR = 3e-3
@@ -86,16 +87,7 @@ def model_stats_grownet(model, X, Y):
     # utility update (act-only; grad part added in train step)
     n = h.size(1)
     model.hidden.utility[:n] = 0.9 * model.hidden.utility[:n] + 0.1 * act.cpu()
-    # grad-hint: top PC of hardest 25% input embeddings
-    E = model._fwd["e"].detach().cpu().numpy()  # (B,in)
-    hard = np.argsort(-nll.detach().cpu().numpy())[:max(32, len(E)//4)]
-    Eh = E[hard] - E[hard].mean(0, keepdims=True)
-    try:
-        _, _, Vt = np.linalg.svd(Eh, full_matrices=False)
-        hint = torch.from_numpy(Vt[0].astype(np.float32))
-    except Exception:
-        hint = torch.randn(model.in_dim) * 0.1
-    return surprise, dormant_frac, hint, float(nll.median())
+    return surprise, dormant_frac, float(nll.median())
 
 
 def count_params(m):
@@ -148,7 +140,7 @@ def main():
     print(f"vocab({V}): {info['vocab']}")
     print(f"train {Xtr.shape} val {Xva.shape} test-unseen-combos {Xte.shape}")
 
-    grow = PFCGrowNet(V, D_EMB, CTX, h0=H0, hmax=HMAX).to(DEVICE)
+    grow = PFCGrowNet(V, D_EMB, CTX, h0=H0, hmax=HMAX, deepmax=DEEPMAX).to(DEVICE)
     small = FixedMLM(V, D_EMB, CTX, h=H0).to(DEVICE)
     large = FixedMLM(V, D_EMB, CTX, h=HMAX).to(DEVICE)
     print("params: grow(seed)=%d small=%d large=%d" % (count_params(grow), count_params(small), count_params(large)))
@@ -156,14 +148,12 @@ def main():
     models = {"grownet": grow, "fixed_small": small, "fixed_large": large}
     opts = {k: torch.optim.AdamW(m.parameters(), lr=BASE_LR, weight_decay=WD) for k, m in models.items()}
     hist = {k: {"train_loss": [], "val_loss": [], "val_acc": [], "test_loss": [], "test_acc": [],
-                "hsize": [], "dormant": [], "surprise": [], "da": []} for k in models}
+                "hsize": [], "dsize": [], "edges": [], "dormant": [], "surprise": [], "da": []} for k in models}
     # replay buffer: list of (x, y)
     replay_x, replay_y = [], []
     best_val = {k: 1e9 for k in models}
-    no_improve = {"grownet": 0}
     ewc_on = False
     da_avg = 2.0
-    prev_val = None
 
     for epoch in range(EPOCHS):
         base_lr = cosine_lr(epoch)
@@ -181,13 +171,17 @@ def main():
             if vl < best_val[k]:
                 best_val[k] = vl
         da_avg = 0.9 * da_avg + 0.1 * float(np.mean([hist[k]["train_loss"][-1] for k in models]))
-        # grownet instrum
-        surp, dorm, hint, med = model_stats_grownet(grow, Xva, Yva)
+        # grownet instrument: growth signals + structural track
+        surp, dorm, med = model_stats_grownet(grow, Xva, Yva)
         hist["grownet"]["hsize"].append(int(grow.hidden.n_active))
+        hist["grownet"]["dsize"].append(int(grow.deep.n_active))
+        hist["grownet"]["edges"].append(int(grow.hidden.active_edges() + grow.deep.active_edges()))
         hist["grownet"]["dormant"].append(dorm)
         hist["grownet"]["surprise"].append(surp)
         for k in ("fixed_small", "fixed_large"):
             hist[k]["hsize"].append(H0 if k == "fixed_small" else HMAX)
+            hist[k]["dsize"].append(0)
+            hist[k]["edges"].append(0)
             hist[k]["dormant"].append(0.0); hist[k]["surprise"].append(surp)
         # collect replay: hardest train samples this epoch
         with torch.no_grad():
@@ -201,19 +195,33 @@ def main():
                 replay_x.append(Xtr[i]); replay_y.append(Ytr[i])
             replay_x, replay_y = replay_x[-256:], replay_y[-256:]
 
-        # growth decision every 2 epochs (directional: hint from hard-PC)
+        # LOSS-DRIVEN growth in all dimensions: trial widen vs deepen vs sprout,
+        # commit whichever most reduces held-out loss per added parameter.
         if (epoch + 1) % 2 == 0:
-            cur = hist["grownet"]["val_loss"][-1]
-            improved = (prev_val is None) or (prev_val - cur > 1e-3)
-            prev_val = cur
-            no_improve["grownet"] = 0 if improved else no_improve["grownet"] + 1
-            if (not improved) and no_improve["grownet"] >= 1 and grow.hidden.n_active < HMAX and (dorm > 0.10 or surp > med):
-                added = grow.grow(6, grad_hint=hint.to(grow.hidden.W.device))
-                # baby boost: bump LR next epoch (maturity gate already soft-starts)
-                for g in opts["grownet"].param_groups:
-                    g["lr"] = base_lr * 1.5
-                print(f"[epoch {epoch+1}] GROW +{added} -> h={grow.hidden.n_active} (surp={surp:.3f} dorm={dorm:.2f})")
-                no_improve["grownet"] = 0
+            rngp = np.random.RandomState(SEED + epoch)
+            pti = rngp.choice(len(Xtr), min(200, len(Xtr)), replace=False)
+            pvi = rngp.choice(len(Xva), min(40, len(Xva)), replace=False)
+            Xpt, Ypt, Xpv, Ypv = Xtr[pti], Ytr[pti], Xva[pvi], Yva[pvi]
+            grow.hidden.prune_edges(0.05)
+            grow.deep.prune_edges(0.05)
+            choice, res = select_growth(grow, Xpt, Ypt, Xpv, Ypv,
+                                        k_widen=2, k_deep=2, k_sprout=16,
+                                        steps=3, seed=epoch)
+            print(f"[epoch {epoch+1}] growth trials: " + ", ".join(
+                f"{d}: drop {res[d]['drop']:+.4f}/{res[d]['dparams']}p" for d in ("widen", "deepen", "sprout"))
+                + f" -> {choice} (h={grow.hidden.n_active}, d={grow.deep.n_active})")
+            torch.manual_seed(epoch)
+            if choice == "widen":
+                E, _ = hard_inputs(grow, Xpt, Ypt)
+                hint = pc_hint(E)
+                grow.grow_hidden(2, grad_hint=None if hint is None else hint.to(grow.hidden.W.device))
+            elif choice == "deepen":
+                _, H = hard_inputs(grow, Xpt, Ypt)
+                hint = pc_hint(H)
+                grow.grow_deep(2, grad_hint=None if hint is None else hint.to(grow.deep.W.device))
+            elif choice == "sprout":
+                grow.hidden.sprout_edges(16, seed=epoch)
+                grow.deep.sprout_edges(8, seed=epoch + 1)
         # sleep replay + EWC snapshot every 4 epochs
         if (epoch + 1) % 4 == 0 and len(replay_x) > 64:
             RX = np.stack(replay_x[-256:]); RY = np.array(replay_y[-256:])
@@ -221,15 +229,17 @@ def main():
             grow.snapshot_ewc(None)
             ewc_on = True
             print(f"[epoch {epoch+1}] SLEEP replay on {len(RX)} hard samples (loss {tl:.3f}); EWC on")
-        # prune every 6 epochs
+        # prune every 6 epochs (never below the 3-neuron seed)
         if (epoch + 1) % 6 == 0:
-            before = grow.hidden.n_active
-            grow.prune_dormant(min_keep=10, thresh=0.05)
-            if grow.hidden.n_active != before:
-                print(f"[epoch {epoch+1}] PRUNE {before} -> {grow.hidden.n_active}")
+            before = (grow.hidden.n_active, grow.deep.n_active)
+            grow.prune_hidden_dormant(min_keep=SEED_N, thresh=0.05)
+            grow.prune_deep_dormant(thresh=0.05)
+            after = (grow.hidden.n_active, grow.deep.n_active)
+            if after != before:
+                print(f"[epoch {epoch+1}] PRUNE h {before[0]}->{after[0]}, d {before[1]}->{after[1]}")
         print(f"ep {epoch+1:02d} | " + " | ".join(
             f"{k}: tr {hist[k]['train_loss'][-1]:.3f} va {hist[k]['val_loss'][-1]:.3f}/{hist[k]['val_acc'][-1]:.2f} te {hist[k]['test_loss'][-1]:.3f}/{hist[k]['test_acc'][-1]:.2f}"
-            for k in models) + f" | h={grow.hidden.n_active}")
+            for k in models) + f" | h={grow.hidden.n_active} d={grow.deep.n_active}")
 
     # final save
     torch.save(grow.state_dict(), HERE / "grownet.pt")
@@ -245,6 +255,7 @@ def main():
             "val_acc": hist[k]["val_acc"][-1], "test_acc": hist[k]["test_acc"][-1],
             "gen_gap_loss": te - tr, "gen_gap_acc": hist[k]["val_acc"][-1] - hist[k]["test_acc"][-1],
             "params": count_params(models[k]), "hsize": hist[k]["hsize"][-1],
+            "dsize": hist[k]["dsize"][-1], "edges": hist[k]["edges"][-1],
         }
     with open(HERE / "metrics.json", "w") as f:
         json.dump({"summary": summary, "hist": hist, "vocab": info["vocab"],
@@ -268,9 +279,10 @@ def main():
     plt.legend(); plt.tight_layout(); plt.savefig(PLOTS / "test_acc.png"); plt.close()
 
     plt.figure(figsize=(9, 4))
-    plt.plot(ep, hist["grownet"]["hsize"], marker="o")
-    plt.xlabel("epoch"); plt.ylabel("active hidden neurons"); plt.title("GrowNet growth trajectory (seed 12 -> max 48)")
-    plt.tight_layout(); plt.savefig(PLOTS / "growth.png"); plt.close()
+    plt.plot(ep, hist["grownet"]["hsize"], marker="o", label="L1 neurons")
+    plt.plot(ep, hist["grownet"]["dsize"], marker="s", label="L2 neurons")
+    plt.xlabel("epoch"); plt.ylabel("active neurons"); plt.title("GrowNet growth: 3-neuron seed, all dimensions by loss")
+    plt.legend(); plt.tight_layout(); plt.savefig(PLOTS / "growth.png"); plt.close()
 
     fig, ax1 = plt.subplots(figsize=(9, 4))
     ax1.plot(ep, hist["grownet"]["surprise"], "r-", label="surprise (val NLL)")

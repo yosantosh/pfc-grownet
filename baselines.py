@@ -12,9 +12,11 @@ class FixedMLM(nn.Module):
         self.ln = nn.LayerNorm(h)
         self.drop = nn.Dropout(dropout)
         self.fc2 = nn.Linear(h, vocab)
+        # same residual skip as GrowNet: isolates the comparison to *growth*
+        self.skip = nn.Linear(context * d_emb, vocab, bias=False)
 
     def forward(self, ctx, mem=None):
         e = self.emb(ctx).view(ctx.size(0), -1)
         h = torch.tanh(self.ln(self.fc1(e)))
         h = self.drop(h)
-        return self.fc2(h), None
+        return self.fc2(h) + self.skip(e), None

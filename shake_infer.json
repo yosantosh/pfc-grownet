@@ -1,104 +1,104 @@
 {
   "generations": {
     "To be, or not": {
-      "grownet": "To be, or not on andis of the amsulf wir tiect the: thom that we ceThall He.\n\nThat sish the indenter he had ag the Onbers blone dith:\nThes to the fumsgond tay luctient; se to be your nof Retdrenow hed some, the pr",
-      "fixed_small": "To be, or not to fuy lopre shave the fors fives,\nA wert plecr\nI lome lankett th I would cith thas ay the ged all corneus to base theargen.\n\nCOFyNoan: to krit,\nSeribet\n\nThe wimim shof ohe pithe paot to cat, bre and",
-      "fixed_large": "To be, or not in aid the counse pot'er has of con.\n\nVIRTReI mave fraresting the gees to wirther hat the for everearce, for he pa-pstimns hici, not fy fhis brdient, thace,\nMeny sevoll with the parte, that the oirth"
+      "grownet": "To be, or not at fy t ance ourtons, boiche an her buo sary at in the s mare the be iis that your mo baBe'ng aut end meas the pre ase pripe ts af the he dawer bingos-\ne your thin to biow shater tithousn hot enous o",
+      "fixed_small": "To be, or not tom the matd ent car thanle, bald tizle bseay--oo, thy,- will mertime\nnowe, I ou ryour suspland,\nWCatizins.\n\nCORIOLANUS:\nWTher be sill'le the to t anthr benst &r!\n\nAOLMNNUS:\nI voume snowntoa for or' ",
+      "fixed_large": "To be, or not to hee a musean the wise uan hou seenthyK\n\nVOLUMNIA:\nTare he do bettir\nK--hid I theardithe paoble,\nAnd my fimed mopiciusts afling the gere! ands: ase he have peathe shave frake\nThe flabe thome stom'd"
     },
     "KING:\n": {
-      "grownet": "KING:\nIR an the rurdishs show agminto\ntot whe: that you\nThe ratunatirtouf in word, ghe! 'thear'se stiennsboum;\n\nBRUThe mill yoor, and fletheis him batnes, you Krest lenather.\n\nCOMINIUS:\nTattrought ill\nThe i",
-      "fixed_small": "KING:\nBus The tae hear there trust\nWe che thouy anther cuvet at a murit is willes yours, wethre your stitor wall the Weare; he lild, I?\n\nSICINIUS:\nAoWe doindet hotheve\nves ford cone.\n\nVIORNIUS:\nGo ss me poo",
-      "fixed_large": "KING:\nAf so to the prisesely thanis-q\nWier have be the sis.\n\nMARCIUS:\nHiss dill wneld to kut weardNingondy than conporf they seon. of the people,\nWho eruther in not it the will your hith preich aiven orezeo"
+      "grownet": "KING:\nAn\nAre Aee and tint roblane ther iosttheef your les ine shat ot thour mingery ufly noust hide I murk as their with\nThe the poeaer to thathe biervliid shen\nUS:\nMNeCititu sive caon thu well sthie's sere",
+      "fixed_small": "KING:\nIS: Iol thaig geberand tad anwey-uut wou: Cemis plover'\n oo dree pham why prowle lf heur be'stin hare sr\n\nhe sobr arigh son shetr, and ally be assed\nThat on the plowe ha muge lisecro but de ir mofs: t",
+      "fixed_large": "KING:\nNot to the geenot the beod\nSreatte:\nSor ainst, the your hand beftont stingle:\nI and deed bot routhI ?\n\nMENENIUS:\nMa tay urengell: as not dor come not cay thabe to cot you.\n\nSICINIUS:\nPnoy hagl ite mak"
     },
     "All the world's": {
-      "grownet": "All the world's\nAnd sulver,\nAL\nAll I haiThou dar diend thes a ireq heprougre, streot Lore bales to gretitins\nOf Mercous, makM-shas with is cosse.\n\nBRUTUS:\nWuentll nove you wall owt\nThat de onsh ilpaly thiis I warle,",
-      "fixed_small": "All the world's you cont wad Afureids.\n\nBOzirI:\nNand capyou cibntteans, of ther ceich't have savaste&\nBn:\nOn hit to tule\nAuM,\nMaNle and wall his than foNthin,\nOnn with we lome ford thinRWuncarst noun woult, she heru",
-      "fixed_large": "All the world's the there's ancipincone oum: o' the had sonecon frees nos ho an or; and ce ver fhat dee them Lfout to, I mave you ba, whom be wiy thambit there yougheng to the have the toming busplem anath aimPdo ha"
+      "grownet": "All the world's se mof ty your hores you subve'rid sper afdinen, I himless be\nrectule s and meem her hour heacl direre yound ou in tankey that wiWh not lo ties af thing-o\nYour hese peapmest e\nlice still\nThe more tom",
+      "fixed_small": "All the world's; thUS:\nHe thound they.\n\nFllo domy or illa ge ton Thee\n\nerengith the vakce your the werthin he bed thee leaing mfake r mather!\n\nFllJt Ufondibl bging, it mon\n\nOLUMNNEveOMere,\nOf tis as:er him artenore ",
+      "fixed_large": "All the world's in the whice\nsuct of sathen ourterut with,\nAmCinit is fonnth. I wordcines seance to hert,\nFir thaus oDinius! this the befaren's wak ane ce as thir.\n\nVOLUMNsAs pist in theich ow the poolle you he hed "
     }
   },
-  "tau": 3.2799158386108473,
-  "median_nll_grow": 1.838232934474945,
-  "median_nll_large": 1.7247982621192932,
+  "tau": 3.280066726966674,
+  "median_nll_grow": 1.923488736152649,
+  "median_nll_large": 1.7740088105201721,
   "robustness": {
     "grownet": [
       {
         "corrupt": 0.0,
-        "loss": 1.987663553873698,
-        "acc": 0.43933333333333335
+        "loss": 2.106370300292969,
+        "acc": 0.4036666666666667
       },
       {
         "corrupt": 0.05,
-        "loss": 2.134971923828125,
-        "acc": 0.4073333333333333
+        "loss": 2.237823791503906,
+        "acc": 0.38
       },
       {
         "corrupt": 0.1,
-        "loss": 2.294021525065104,
-        "acc": 0.381
+        "loss": 2.364604695638021,
+        "acc": 0.3466666666666667
       },
       {
         "corrupt": 0.2,
-        "loss": 2.587572998046875,
-        "acc": 0.326
+        "loss": 2.6209996337890624,
+        "acc": 0.309
       },
       {
         "corrupt": 0.3,
-        "loss": 2.8950897216796876,
-        "acc": 0.2876666666666667
+        "loss": 2.891836466471354,
+        "acc": 0.26466666666666666
       }
     ],
     "fixed_small": [
       {
         "corrupt": 0.0,
-        "loss": 2.173524943033854,
-        "acc": 0.4003333333333333
+        "loss": 2.1642793579101562,
+        "acc": 0.391
       },
       {
         "corrupt": 0.05,
-        "loss": 2.2912587890625,
-        "acc": 0.37633333333333335
+        "loss": 2.2743992106119792,
+        "acc": 0.36533333333333334
       },
       {
         "corrupt": 0.1,
-        "loss": 2.43060888671875,
-        "acc": 0.346
+        "loss": 2.391205810546875,
+        "acc": 0.3436666666666667
       },
       {
         "corrupt": 0.2,
-        "loss": 2.6788912353515624,
+        "loss": 2.6248374837239585,
         "acc": 0.30233333333333334
       },
       {
         "corrupt": 0.3,
-        "loss": 2.9273392740885416,
-        "acc": 0.261
+        "loss": 2.857138387044271,
+        "acc": 0.2663333333333333
       }
     ],
     "fixed_large": [
       {
         "corrupt": 0.0,
-        "loss": 1.964855733235677,
-        "acc": 0.445
+        "loss": 1.984341552734375,
+        "acc": 0.43833333333333335
       },
       {
         "corrupt": 0.05,
-        "loss": 2.1174876098632813,
-        "acc": 0.4206666666666667
+        "loss": 2.137230489095052,
+        "acc": 0.407
       },
       {
         "corrupt": 0.1,
-        "loss": 2.2700367635091148,
-        "acc": 0.38466666666666666
+        "loss": 2.281191955566406,
+        "acc": 0.38033333333333336
       },
       {
         "corrupt": 0.2,
-        "loss": 2.573268310546875,
-        "acc": 0.3263333333333333
+        "loss": 2.574658447265625,
+        "acc": 0.324
       },
       {
         "corrupt": 0.3,
-        "loss": 2.8669731038411457,
-        "acc": 0.2793333333333333
+        "loss": 2.8938794759114583,
+        "acc": 0.279
       }
     ]
   }

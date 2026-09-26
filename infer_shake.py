@@ -21,8 +21,8 @@ torch.manual_seed(7); np.random.seed(7)
 
 
 def load_models(V):
-    grow = PFCGrowNet(V, 24, 8, h0=24, hmax=96, mem_dim=24).to(DEVICE)
-    small = FixedMLM(V, 24, 8, h=24).to(DEVICE)
+    grow = PFCGrowNet(V, 24, 8, h0=3, hmax=96, mem_dim=24).to(DEVICE)
+    small = FixedMLM(V, 24, 8, h=3).to(DEVICE)
     large = FixedMLM(V, 24, 8, h=96).to(DEVICE)
     grow.load_state_dict(torch.load(HERE / "shake_grownet.pt", map_location=DEVICE))
     small.load_state_dict(torch.load(HERE / "shake_fixed_small.pt", map_location=DEVICE))
@@ -30,6 +30,7 @@ def load_models(V):
     try:
         mj = json.load(open(HERE / "shake_metrics.json"))
         grow.hidden.n_active = int(mj["hist"]["grownet"]["hsize"][-1])
+        grow.deep.n_active = int(mj["hist"]["grownet"].get("dsize", [0])[-1])
     except Exception:
         pass
     for m in (grow, small, large):
